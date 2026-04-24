@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
+import { useToast } from '../components/ToastContext';
 
 function PromptDetail() {
   const { id } = useParams();
@@ -9,6 +10,7 @@ function PromptDetail() {
   const [showEdit, setShowEdit] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', prompt_text: '', category: '' });
   const token = localStorage.getItem('token');
+  const toast = useToast();
 
   useEffect(() => {
     fetch(`/api/prompts/${id}`, { headers: { Authorization: `Bearer ${token}` } })
@@ -21,8 +23,10 @@ function PromptDetail() {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this prompt?')) return;
+    const confirmed = await toast.confirm('Are you sure you want to delete this prompt?');
+    if (!confirmed) return;
     await fetch(`/api/prompts/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+    toast.success('Prompt deleted');
     navigate('/prompts');
   };
 
@@ -36,6 +40,7 @@ function PromptDetail() {
     const updated = await res.json();
     setItem(updated);
     setShowEdit(false);
+    toast.success('Prompt updated');
   };
 
   if (!item) return <div className="loading"><div className="spinner"></div>Loading...</div>;
@@ -49,43 +54,19 @@ function PromptDetail() {
         <button className="btn-danger" onClick={handleDelete}>Delete</button>
       </div>
       <div className="detail-info">
-        <div>
-          <label>Description</label>
-          <p>{item.description || 'No description'}</p>
-        </div>
-        <div>
-          <label>Prompt Text</label>
-          <p>{item.prompt_text}</p>
-        </div>
-        <div>
-          <label>Category</label>
-          <p>{item.category || 'Uncategorized'}</p>
-        </div>
-        <div>
-          <label>Created</label>
-          <p>{new Date(item.created_at).toLocaleString()}</p>
-        </div>
+        <div><label>Description</label><p>{item.description || 'No description'}</p></div>
+        <div><label>Prompt Text</label><p>{item.prompt_text}</p></div>
+        <div><label>Category</label><p>{item.category || 'Uncategorized'}</p></div>
+        <div><label>Created</label><p>{new Date(item.created_at).toLocaleString()}</p></div>
       </div>
 
       {showEdit && (
         <Modal title="Edit Prompt" onClose={() => setShowEdit(false)}>
           <form onSubmit={handleEdit}>
-            <div className="form-group">
-              <label>Title</label>
-              <input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-            </div>
-            <div className="form-group">
-              <label>Prompt Text</label>
-              <textarea value={form.prompt_text} onChange={e => setForm({...form, prompt_text: e.target.value})} required />
-            </div>
-            <div className="form-group">
-              <label>Category</label>
-              <input value={form.category} onChange={e => setForm({...form, category: e.target.value})} />
-            </div>
+            <div className="form-group"><label>Title</label><input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required /></div>
+            <div className="form-group"><label>Description</label><textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></div>
+            <div className="form-group"><label>Prompt Text</label><textarea value={form.prompt_text} onChange={e => setForm({...form, prompt_text: e.target.value})} required /></div>
+            <div className="form-group"><label>Category</label><input value={form.category} onChange={e => setForm({...form, category: e.target.value})} /></div>
             <div className="modal-actions">
               <button type="submit" className="btn-primary">Save</button>
               <button type="button" className="btn-secondary" onClick={() => setShowEdit(false)}>Cancel</button>

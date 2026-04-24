@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
+import { useToast } from '../components/ToastContext';
 
 function StyleDetail() {
   const { id } = useParams();
@@ -9,6 +10,7 @@ function StyleDetail() {
   const [showEdit, setShowEdit] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', example_prompt: '' });
   const token = localStorage.getItem('token');
+  const toast = useToast();
 
   useEffect(() => {
     fetch(`/api/styles/${id}`, { headers: { Authorization: `Bearer ${token}` } })
@@ -21,8 +23,10 @@ function StyleDetail() {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this style?')) return;
+    const confirmed = await toast.confirm('Are you sure you want to delete this style?');
+    if (!confirmed) return;
     await fetch(`/api/styles/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+    toast.success('Style deleted');
     navigate('/styles');
   };
 
@@ -36,6 +40,7 @@ function StyleDetail() {
     const updated = await res.json();
     setItem(updated);
     setShowEdit(false);
+    toast.success('Style updated');
   };
 
   if (!item) return <div className="loading"><div className="spinner"></div>Loading...</div>;
@@ -50,35 +55,17 @@ function StyleDetail() {
         <button className="btn-danger" onClick={handleDelete}>Delete</button>
       </div>
       <div className="detail-info">
-        <div>
-          <label>Description</label>
-          <p>{item.description || 'No description'}</p>
-        </div>
-        <div>
-          <label>Example Prompt</label>
-          <p>{item.example_prompt || 'N/A'}</p>
-        </div>
-        <div>
-          <label>Created</label>
-          <p>{new Date(item.created_at).toLocaleString()}</p>
-        </div>
+        <div><label>Description</label><p>{item.description || 'No description'}</p></div>
+        <div><label>Example Prompt</label><p>{item.example_prompt || 'N/A'}</p></div>
+        <div><label>Created</label><p>{new Date(item.created_at).toLocaleString()}</p></div>
       </div>
 
       {showEdit && (
         <Modal title="Edit Style" onClose={() => setShowEdit(false)}>
           <form onSubmit={handleEdit}>
-            <div className="form-group">
-              <label>Name</label>
-              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-            </div>
-            <div className="form-group">
-              <label>Example Prompt</label>
-              <textarea value={form.example_prompt} onChange={e => setForm({...form, example_prompt: e.target.value})} />
-            </div>
+            <div className="form-group"><label>Name</label><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required /></div>
+            <div className="form-group"><label>Description</label><textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></div>
+            <div className="form-group"><label>Example Prompt</label><textarea value={form.example_prompt} onChange={e => setForm({...form, example_prompt: e.target.value})} /></div>
             <div className="modal-actions">
               <button type="submit" className="btn-primary">Save</button>
               <button type="button" className="btn-secondary" onClick={() => setShowEdit(false)}>Cancel</button>

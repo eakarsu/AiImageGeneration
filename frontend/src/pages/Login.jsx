@@ -1,11 +1,20 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useToast } from '../components/ToastContext';
+import useFormValidation, { validators } from '../hooks/useFormValidation';
+
+const rules = {
+  email: [validators.required, validators.email],
+  password: [validators.required],
+};
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const toast = useToast();
+  const { getFieldError, handleBlur, validateAll } = useFormValidation(rules);
 
   const handleAutofill = () => {
     setEmail('demo@example.com');
@@ -15,6 +24,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (!validateAll({ email, password })) return;
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -24,11 +34,14 @@ function Login() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       localStorage.setItem('token', data.token);
+      toast.success('Welcome back!');
       navigate('/');
     } catch (err) {
       setError(err.message);
     }
   };
+
+  const values = { email, password };
 
   return (
     <div className="login-container">
@@ -42,11 +55,30 @@ function Login() {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => handleBlur('email', email, values)}
+              className={getFieldError('email') ? 'input-error' : ''}
+              placeholder="Enter your email"
+            />
+            {getFieldError('email') && <div className="field-error">{getFieldError('email')}</div>}
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => handleBlur('password', password, values)}
+              className={getFieldError('password') ? 'input-error' : ''}
+              placeholder="Enter your password"
+            />
+            {getFieldError('password') && <div className="field-error">{getFieldError('password')}</div>}
+          </div>
+          <div className="forgot-link">
+            <Link to="/forgot-password">Forgot Password?</Link>
           </div>
           <button type="submit" className="btn-login">Sign In</button>
         </form>

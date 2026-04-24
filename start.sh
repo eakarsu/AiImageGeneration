@@ -1,16 +1,34 @@
 #!/bin/bash
 
-echo "=== AI Image Generation App (with Stable Diffusion) ==="
+echo "=== AI Image Generation App ==="
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Kill processes on ports 3001, 5050, and 5173
-echo "Cleaning up ports..."
-lsof -ti:3001 | xargs kill -9 2>/dev/null
-lsof -ti:5050 | xargs kill -9 2>/dev/null
-lsof -ti:5173 | xargs kill -9 2>/dev/null
-sleep 1
+# Function to clean up ports
+cleanup_ports() {
+  echo "Cleaning up used ports..."
+  for port in 3001 5050 3000; do
+    pid=$(lsof -ti:$port 2>/dev/null)
+    if [ -n "$pid" ]; then
+      echo "  Killing process on port $port (PID: $pid)"
+      kill -9 $pid 2>/dev/null
+    fi
+  done
+  sleep 1
+}
+
+# Initial cleanup
+cleanup_ports
+
+# Trap to cleanup on exit
+cleanup() {
+  echo ""
+  echo "Shutting down..."
+  cleanup_ports
+  exit 0
+}
+trap cleanup SIGINT SIGTERM
 
 # Check if PostgreSQL is running
 echo "Checking PostgreSQL..."
@@ -27,73 +45,107 @@ fi
 echo "Setting up database..."
 createdb ai_image_gen 2>/dev/null || true
 
-# --- Stable Diffusion Server ---
+# --- Stable Diffusion Server (Optional) ---
 echo ""
-echo "Setting up Stable Diffusion server..."
+echo "Checking Stable Diffusion server setup..."
 cd "$SCRIPT_DIR/sd_server"
 
-if [ ! -d "venv" ]; then
-  echo "Creating Python virtual environment..."
-  python3 -m venv venv
+if [ -f "server.py" ]; then
+  if [ ! -d "venv" ]; then
+    echo "Creating Python virtual environment..."
+    python3 -m venv venv
+  fi
+
+  echo "Installing Python dependencies..."
+  source venv/bin/activate
+  pip install -r requirements.txt --quiet 2>/dev/null
+
+  echo "Starting SD server on port 5050 (background)..."
+  python server.py &
+  SD_PID=$!
+  deactivate 2>/dev/null
+
+  # Wait for SD server briefly
+  echo "Waiting for SD server..."
+  for i in $(seq 1 30); do
+    if curl -s http://127.0.0.1:5050/health > /dev/null 2>&1; then
+      echo "  SD server responding!"
+      break
+    fi
+    sleep 1
+  done
+else
+  echo "SD server not found, skipping..."
+  SD_PID=""
 fi
 
-echo "Installing Python dependencies..."
-source venv/bin/activate
-pip install -r requirements.txt --quiet
-
-echo "Starting SD server on port 5050..."
-python server.py &
-SD_PID=$!
-deactivate 2>/dev/null
-
-# Wait for SD server to respond (model loading takes time on first run)
-echo "Waiting for SD server to start (model download may take a while on first run)..."
-for i in $(seq 1 120); do
-  if curl -s http://127.0.0.1:5050/health > /dev/null 2>&1; then
-    SD_STATUS=$(curl -s http://127.0.0.1:5050/health | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null)
-    if [ "$SD_STATUS" = "ready" ]; then
-      echo "SD server is ready!"
-      break
-    elif [ "$SD_STATUS" = "error" ]; then
-      echo "SD server encountered an error. Check logs above."
-      break
-    else
-      echo "  SD server status: loading model... ($i)"
-    fi
-  fi
-  sleep 3
-done
-
-# --- Node Backend ---
+# --- Node Backend with Hot Reload ---
 echo ""
-echo "Installing backend dependencies..."
+echo "Setting up backend..."
 cd "$SCRIPT_DIR/backend"
-npm install
+npm install --silent
 
+# Run database seed
 echo "Seeding database..."
-node seed.js
+node seed.js --force
 
-echo "Starting backend on port 3001..."
-node server.js &
+# Check if nodemon is installed globally or locally
+if command -v nodemon &> /dev/null || [ -f "node_modules/.bin/nodemon" ]; then
+  echo "Starting backend with hot reload on port 3001..."
+  npx nodemon server.js &
+else
+  # Install nodemon locally if not present
+  echo "Installing nodemon for hot reload..."
+  npm install --save-dev nodemon --silent
+  echo "Starting backend with hot reload on port 3001..."
+  npx nodemon server.js &
+fi
 BACKEND_PID=$!
 
-# --- Frontend ---
-echo "Installing frontend dependencies..."
-cd "$SCRIPT_DIR/frontend"
-npm install
+# Wait for backend to be ready
+sleep 2
+for i in $(seq 1 10); do
+  if curl -s http://127.0.0.1:3001/api/health > /dev/null 2>&1; then
+    echo "  Backend is ready!"
+    break
+  fi
+  sleep 1
+done
 
-echo "Starting frontend on port 5173..."
+# --- Frontend with Hot Reload (Vite) ---
+echo ""
+echo "Setting up frontend..."
+cd "$SCRIPT_DIR/frontend"
+npm install --silent
+
+echo "Starting frontend with hot reload on port 3000..."
 npm run dev &
 FRONTEND_PID=$!
 
-echo ""
-echo "=== App is running! ==="
-echo "Frontend: http://localhost:5173"
-echo "Backend:  http://localhost:3001"
-echo "SD Server: http://localhost:5050"
-echo "Login:    demo@example.com / password123"
-echo ""
-echo "Press Ctrl+C to stop"
+# Wait for frontend
+sleep 3
 
-trap "kill $SD_PID $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit" SIGINT SIGTERM
-wait
+echo ""
+echo "=========================================="
+echo "       App is running!"
+echo "=========================================="
+echo ""
+echo "  Frontend:   http://localhost:3000"
+echo "  Backend:    http://localhost:3001"
+echo "  SD Server:  http://localhost:5050"
+echo ""
+echo "  Login: demo@example.com / password123"
+echo ""
+echo "  Hot reload enabled for both frontend and backend!"
+echo "  Edit code and changes will reload automatically."
+echo ""
+echo "  Press Ctrl+C to stop all services"
+echo "=========================================="
+echo ""
+
+# Wait for all processes
+if [ -n "$SD_PID" ]; then
+  wait $SD_PID $BACKEND_PID $FRONTEND_PID
+else
+  wait $BACKEND_PID $FRONTEND_PID
+fi

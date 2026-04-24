@@ -1,5 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useToast } from '../components/ToastContext';
+import useFormValidation, { validators } from '../hooks/useFormValidation';
+
+const rules = {
+  email: [validators.required, validators.email],
+  password: [validators.required, validators.minLength(6)],
+  confirmPassword: [validators.required, validators.match('password', 'Password')],
+};
 
 function Register() {
   const [email, setEmail] = useState('');
@@ -7,20 +15,15 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const toast = useToast();
+  const { getFieldError, handleBlur, validateAll } = useFormValidation(rules);
+
+  const values = { email, password, confirmPassword };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
+    if (!validateAll(values)) return;
 
     try {
       const res = await fetch('/api/auth/register', {
@@ -31,6 +34,7 @@ function Register() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       localStorage.setItem('token', data.token);
+      toast.success('Account created successfully!');
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -46,15 +50,39 @@ function Register() {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" required />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => handleBlur('email', email, values)}
+              className={getFieldError('email') ? 'input-error' : ''}
+              placeholder="Enter your email"
+            />
+            {getFieldError('email') && <div className="field-error">{getFieldError('email')}</div>}
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => handleBlur('password', password, values)}
+              className={getFieldError('password') ? 'input-error' : ''}
+              placeholder="At least 6 characters"
+            />
+            {getFieldError('password') && <div className="field-error">{getFieldError('password')}</div>}
           </div>
           <div className="form-group">
             <label>Confirm Password</label>
-            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm your password" required />
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              onBlur={() => handleBlur('confirmPassword', confirmPassword, values)}
+              className={getFieldError('confirmPassword') ? 'input-error' : ''}
+              placeholder="Confirm your password"
+            />
+            {getFieldError('confirmPassword') && <div className="field-error">{getFieldError('confirmPassword')}</div>}
           </div>
           <button type="submit" className="btn-login">Create Account</button>
         </form>

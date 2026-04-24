@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../components/ToastContext';
 
 function HistoryDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState(null);
   const token = localStorage.getItem('token');
+  const toast = useToast();
 
   useEffect(() => {
     fetch(`/api/history/${id}`, { headers: { Authorization: `Bearer ${token}` } })
@@ -15,8 +17,10 @@ function HistoryDetail() {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this history entry?')) return;
+    const confirmed = await toast.confirm('Are you sure you want to delete this history entry?');
+    if (!confirmed) return;
     await fetch(`/api/history/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+    toast.success('History entry deleted');
     navigate('/history');
   };
 
@@ -45,34 +49,12 @@ function HistoryDetail() {
         <button className="btn-danger" onClick={handleDelete}>Delete</button>
       </div>
       <div className="detail-info">
-        <div>
-          <label>Prompt</label>
-          <p>{item.prompt}</p>
-        </div>
-        {item.negative_prompt && (
-          <div>
-            <label>Negative Prompt</label>
-            <p>{item.negative_prompt}</p>
-          </div>
-        )}
-        <div>
-          <label>Style</label>
-          <p>{item.style || 'N/A'}</p>
-        </div>
-        {item.seed && (
-          <div>
-            <label>Seed</label>
-            <p>{item.seed}</p>
-          </div>
-        )}
-        <div>
-          <label>Status</label>
-          <p>{item.status}</p>
-        </div>
-        <div>
-          <label>Created</label>
-          <p>{new Date(item.created_at).toLocaleString()}</p>
-        </div>
+        <div><label>Prompt</label><p>{item.prompt}</p></div>
+        {item.negative_prompt && <div><label>Negative Prompt</label><p>{item.negative_prompt}</p></div>}
+        <div><label>Style</label><p>{item.style || 'N/A'}</p></div>
+        {item.seed && <div><label>Seed</label><p>{item.seed}</p></div>}
+        <div><label>Status</label><p>{item.status}</p></div>
+        <div><label>Created</label><p>{new Date(item.created_at).toLocaleString()}</p></div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
+import { useToast } from '../components/ToastContext';
 
 function GalleryDetail() {
   const { id } = useParams();
@@ -9,6 +10,7 @@ function GalleryDetail() {
   const [showEdit, setShowEdit] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', prompt: '', style: '' });
   const token = localStorage.getItem('token');
+  const toast = useToast();
 
   useEffect(() => {
     fetch(`/api/gallery/${id}`, { headers: { Authorization: `Bearer ${token}` } })
@@ -21,8 +23,10 @@ function GalleryDetail() {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this gallery item?')) return;
+    const confirmed = await toast.confirm('Are you sure you want to delete this gallery item?');
+    if (!confirmed) return;
     await fetch(`/api/gallery/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+    toast.success('Gallery item deleted');
     navigate('/gallery');
   };
 
@@ -36,6 +40,7 @@ function GalleryDetail() {
     const updated = await res.json();
     setItem(updated);
     setShowEdit(false);
+    toast.success('Gallery item updated');
   };
 
   const handleDownload = async () => {
@@ -64,43 +69,19 @@ function GalleryDetail() {
         <button className="btn-danger" onClick={handleDelete}>Delete</button>
       </div>
       <div className="detail-info">
-        <div>
-          <label>Description</label>
-          <p>{item.description || 'No description'}</p>
-        </div>
-        <div>
-          <label>Prompt</label>
-          <p>{item.prompt || 'N/A'}</p>
-        </div>
-        <div>
-          <label>Style</label>
-          <p>{item.style || 'N/A'}</p>
-        </div>
-        <div>
-          <label>Created</label>
-          <p>{new Date(item.created_at).toLocaleString()}</p>
-        </div>
+        <div><label>Description</label><p>{item.description || 'No description'}</p></div>
+        <div><label>Prompt</label><p>{item.prompt || 'N/A'}</p></div>
+        <div><label>Style</label><p>{item.style || 'N/A'}</p></div>
+        <div><label>Created</label><p>{new Date(item.created_at).toLocaleString()}</p></div>
       </div>
 
       {showEdit && (
         <Modal title="Edit Gallery Item" onClose={() => setShowEdit(false)}>
           <form onSubmit={handleEdit}>
-            <div className="form-group">
-              <label>Title</label>
-              <input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-            </div>
-            <div className="form-group">
-              <label>Prompt</label>
-              <input value={form.prompt} onChange={e => setForm({...form, prompt: e.target.value})} />
-            </div>
-            <div className="form-group">
-              <label>Style</label>
-              <input value={form.style} onChange={e => setForm({...form, style: e.target.value})} />
-            </div>
+            <div className="form-group"><label>Title</label><input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required /></div>
+            <div className="form-group"><label>Description</label><textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></div>
+            <div className="form-group"><label>Prompt</label><input value={form.prompt} onChange={e => setForm({...form, prompt: e.target.value})} /></div>
+            <div className="form-group"><label>Style</label><input value={form.style} onChange={e => setForm({...form, style: e.target.value})} /></div>
             <div className="modal-actions">
               <button type="submit" className="btn-primary">Save</button>
               <button type="button" className="btn-secondary" onClick={() => setShowEdit(false)}>Cancel</button>
