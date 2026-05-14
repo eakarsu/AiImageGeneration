@@ -196,7 +196,27 @@ function Sidebar() {
               ))}
             </div>
           ))}
-        </nav>
+        
+        {/* // === Batch 04 Gaps & Frontend Mounts === */}
+        <div style={{ borderTop: '1px solid #eee', marginTop: '0.5rem', paddingTop: '0.5rem' }}>
+        <a href="/cf-agentic-creative-assistant-auto-generati" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>Agentic creative assistant auto-generati</a>
+        <a href="/cf-batch-generation-scheduling-for-weekly-s" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>Batch generation + scheduling for weekly</a>
+        <a href="/cf-prompt-learning-from-user-history-with" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>Prompt learning from user history with a</a>
+        <a href="/cf-image-marketplace-licensing-with-drm-and" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>Image marketplace + licensing with DRM a</a>
+        <a href="/cf-brand-consistency-guardrails-enforcing-u" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>Brand consistency guardrails enforcing u</a>
+        <a href="/cf-multimodal-refinement-combining-referenc" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>Multimodal refinement combining referenc</a>
+        <a href="/gap-no-live-generate-image-endpoint-only" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No live /generate-image endpoint (only r</a>
+        <a href="/gap-no-active-prompt-improvement-ai-only" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No active prompt-improvement AI (only st</a>
+        <a href="/gap-no-real-style-transfer-execution" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No real style-transfer execution</a>
+        <a href="/gap-no-upscaling-execution" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No upscaling execution</a>
+        <a href="/gap-no-variation-execution" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No variation execution</a>
+        <a href="/gap-no-payment-processing-surface-beyond-str" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No payment processing surface beyond Str</a>
+        <a href="/gap-no-image-marketplace-royalty-tracking" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No image marketplace / royalty tracking</a>
+        <a href="/gap-no-collaboration-shared-workspaces" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No collaboration / shared workspaces</a>
+        <a href="/gap-no-public-profileportfolio-pages" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No public profile/portfolio pages</a>
+        <a href="/gap-no-webhook-surface" style={{ display: "block", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>No webhook surface</a>
+        </div>
+</nav>
 
         <div className="sidebar-footer">
           <button className="sidebar-logout" onClick={handleLogout}>
