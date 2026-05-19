@@ -4,6 +4,17 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const pool = require('./db');
+// === Batch 04 Gaps & Frontend Mounts ===
+const route_gap_no_live_generate_image_endpoint_only = require('./routes/gap-no-live-generate-image-endpoint-only');
+const route_gap_no_active_prompt_improvement_ai_only = require('./routes/gap-no-active-prompt-improvement-ai-only');
+const route_gap_no_real_style_transfer_execution = require('./routes/gap-no-real-style-transfer-execution');
+const route_gap_no_upscaling_execution = require('./routes/gap-no-upscaling-execution');
+const route_gap_no_variation_execution = require('./routes/gap-no-variation-execution');
+const route_gap_no_payment_processing_surface_beyond_str = require('./routes/gap-no-payment-processing-surface-beyond-str');
+const route_gap_no_image_marketplace_royalty_tracking = require('./routes/gap-no-image-marketplace-royalty-tracking');
+const route_gap_no_collaboration_shared_workspaces = require('./routes/gap-no-collaboration-shared-workspaces');
+const route_gap_no_public_profileportfolio_pages = require('./routes/gap-no-public-profileportfolio-pages');
+const route_gap_no_webhook_surface = require('./routes/gap-no-webhook-surface');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -110,6 +121,14 @@ app.use('/api/upscaler', require('./routes/upscaler'));
 app.use('/api/variation-generator', require('./routes/variationGenerator'));
 app.use('/api/brand-asset-creator', require('./routes/brandAssetCreator'));
 app.use('/api/ai-history', require('./routes/aiHistory'));
+// Apply pass 5 — additive: integrations + export
+app.use('/api/integrations', require('./routes/integrations'));
+app.use('/api/export', require('./routes/exportData'));
+app.use('/api/agentic-creative', require('./routes/agenticCreativeAssistant'));
+app.use('/api/batch-scheduled-gen', require('./routes/batchScheduledGen'));
+
+// Custom Views (mounted before any 404 handler / app.listen)
+app.use('/api/custom-views', require('./routes/customViews'));
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -125,6 +144,18 @@ app.get('/api/sd-status', async (req, res) => {
     res.json({ status: 'unavailable', message: 'SD server is not running' });
   }
 });
+
+
+app.use('/api/gap-no-live-generate-image-endpoint-only', route_gap_no_live_generate_image_endpoint_only);
+app.use('/api/gap-no-active-prompt-improvement-ai-only', route_gap_no_active_prompt_improvement_ai_only);
+app.use('/api/gap-no-real-style-transfer-execution', route_gap_no_real_style_transfer_execution);
+app.use('/api/gap-no-upscaling-execution', route_gap_no_upscaling_execution);
+app.use('/api/gap-no-variation-execution', route_gap_no_variation_execution);
+app.use('/api/gap-no-payment-processing-surface-beyond-str', route_gap_no_payment_processing_surface_beyond_str);
+app.use('/api/gap-no-image-marketplace-royalty-tracking', route_gap_no_image_marketplace_royalty_tracking);
+app.use('/api/gap-no-collaboration-shared-workspaces', route_gap_no_collaboration_shared_workspaces);
+app.use('/api/gap-no-public-profileportfolio-pages', route_gap_no_public_profileportfolio_pages);
+app.use('/api/gap-no-webhook-surface', route_gap_no_webhook_surface);
 
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);

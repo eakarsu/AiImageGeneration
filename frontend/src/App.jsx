@@ -29,6 +29,25 @@ import BrandAssetCreatorDetail from './pages/BrandAssetCreatorDetail';
 import Sidebar from './components/Sidebar';
 import ErrorBoundary from './components/ErrorBoundary';
 
+// === Batch 04 Gaps & Frontend Mounts ===
+import CfAgenticCreativeAssistantAutoGenerati from './pages/CfAgenticCreativeAssistantAutoGenerati';
+import CfBatchGenerationSchedulingForWeeklyS from './pages/CfBatchGenerationSchedulingForWeeklyS';
+import CfPromptLearningFromUserHistoryWith from './pages/CfPromptLearningFromUserHistoryWith';
+import CfImageMarketplaceLicensingWithDrmAnd from './pages/CfImageMarketplaceLicensingWithDrmAnd';
+import CfBrandConsistencyGuardrailsEnforcingU from './pages/CfBrandConsistencyGuardrailsEnforcingU';
+import CfMultimodalRefinementCombiningReferenc from './pages/CfMultimodalRefinementCombiningReferenc';
+import GapNoLiveGenerateImageEndpointOnly from './pages/GapNoLiveGenerateImageEndpointOnly';
+import GapNoActivePromptImprovementAiOnly from './pages/GapNoActivePromptImprovementAiOnly';
+import GapNoRealStyleTransferExecution from './pages/GapNoRealStyleTransferExecution';
+import GapNoUpscalingExecution from './pages/GapNoUpscalingExecution';
+import GapNoVariationExecution from './pages/GapNoVariationExecution';
+import GapNoPaymentProcessingSurfaceBeyondStr from './pages/GapNoPaymentProcessingSurfaceBeyondStr';
+import GapNoImageMarketplaceRoyaltyTracking from './pages/GapNoImageMarketplaceRoyaltyTracking';
+import GapNoCollaborationSharedWorkspaces from './pages/GapNoCollaborationSharedWorkspaces';
+import GapNoPublicProfileportfolioPages from './pages/GapNoPublicProfileportfolioPages';
+import GapNoWebhookSurface from './pages/GapNoWebhookSurface';
+import CustomViewsPage from './pages/CustomViewsPage';
+
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/login" />;
@@ -86,7 +105,26 @@ function App() {
         <Route path="/variation-generator/:id" element={<PrivateWithLayout><VariationGeneratorDetail /></PrivateWithLayout>} />
         <Route path="/brand-asset-creator" element={<PrivateWithLayout><BrandAssetCreator /></PrivateWithLayout>} />
         <Route path="/brand-asset-creator/:id" element={<PrivateWithLayout><BrandAssetCreatorDetail /></PrivateWithLayout>} />
-      </Routes>
+      
+          {/* // === Batch 04 Gaps & Frontend Mounts === */}
+          <Route path="/cf-agentic-creative-assistant-auto-generati" element={<CfAgenticCreativeAssistantAutoGenerati />} />
+          <Route path="/cf-batch-generation-scheduling-for-weekly-s" element={<CfBatchGenerationSchedulingForWeeklyS />} />
+          <Route path="/cf-prompt-learning-from-user-history-with" element={<CfPromptLearningFromUserHistoryWith />} />
+          <Route path="/cf-image-marketplace-licensing-with-drm-and" element={<CfImageMarketplaceLicensingWithDrmAnd />} />
+          <Route path="/cf-brand-consistency-guardrails-enforcing-u" element={<CfBrandConsistencyGuardrailsEnforcingU />} />
+          <Route path="/cf-multimodal-refinement-combining-referenc" element={<CfMultimodalRefinementCombiningReferenc />} />
+          <Route path="/gap-no-live-generate-image-endpoint-only" element={<GapNoLiveGenerateImageEndpointOnly />} />
+          <Route path="/gap-no-active-prompt-improvement-ai-only" element={<GapNoActivePromptImprovementAiOnly />} />
+          <Route path="/gap-no-real-style-transfer-execution" element={<GapNoRealStyleTransferExecution />} />
+          <Route path="/gap-no-upscaling-execution" element={<GapNoUpscalingExecution />} />
+          <Route path="/gap-no-variation-execution" element={<GapNoVariationExecution />} />
+          <Route path="/gap-no-payment-processing-surface-beyond-str" element={<GapNoPaymentProcessingSurfaceBeyondStr />} />
+          <Route path="/gap-no-image-marketplace-royalty-tracking" element={<GapNoImageMarketplaceRoyaltyTracking />} />
+          <Route path="/gap-no-collaboration-shared-workspaces" element={<GapNoCollaborationSharedWorkspaces />} />
+          <Route path="/gap-no-public-profileportfolio-pages" element={<GapNoPublicProfileportfolioPages />} />
+          <Route path="/gap-no-webhook-surface" element={<GapNoWebhookSurface />} />
+          <Route path="/custom-views" element={<PrivateWithLayout><CustomViewsPage /></PrivateWithLayout>} />
+</Routes>
     </BrowserRouter>
   );
 }
