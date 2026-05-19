@@ -27,6 +27,7 @@ const navSections = [
       { path: '/upscaler', icon: 'upscaler', title: 'AI Upscaler' },
       { path: '/variation-generator', icon: 'variation', title: 'Variation Generator' },
       { path: '/brand-asset-creator', icon: 'brand', title: 'Brand Asset Creator' },
+      { path: '/custom-views', icon: 'gallery', title: 'Image Views' },
     ],
   },
   {

@@ -127,6 +127,9 @@ app.use('/api/export', require('./routes/exportData'));
 app.use('/api/agentic-creative', require('./routes/agenticCreativeAssistant'));
 app.use('/api/batch-scheduled-gen', require('./routes/batchScheduledGen'));
 
+// Custom Views (mounted before any 404 handler / app.listen)
+app.use('/api/custom-views', require('./routes/customViews'));
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });

@@ -46,6 +46,7 @@ import GapNoImageMarketplaceRoyaltyTracking from './pages/GapNoImageMarketplaceR
 import GapNoCollaborationSharedWorkspaces from './pages/GapNoCollaborationSharedWorkspaces';
 import GapNoPublicProfileportfolioPages from './pages/GapNoPublicProfileportfolioPages';
 import GapNoWebhookSurface from './pages/GapNoWebhookSurface';
+import CustomViewsPage from './pages/CustomViewsPage';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -122,6 +123,7 @@ function App() {
           <Route path="/gap-no-collaboration-shared-workspaces" element={<GapNoCollaborationSharedWorkspaces />} />
           <Route path="/gap-no-public-profileportfolio-pages" element={<GapNoPublicProfileportfolioPages />} />
           <Route path="/gap-no-webhook-surface" element={<GapNoWebhookSurface />} />
+          <Route path="/custom-views" element={<PrivateWithLayout><CustomViewsPage /></PrivateWithLayout>} />
 </Routes>
     </BrowserRouter>
   );
