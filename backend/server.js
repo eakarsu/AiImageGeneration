@@ -126,6 +126,7 @@ app.use('/api/integrations', require('./routes/integrations'));
 app.use('/api/export', require('./routes/exportData'));
 app.use('/api/agentic-creative', require('./routes/agenticCreativeAssistant'));
 app.use('/api/batch-scheduled-gen', require('./routes/batchScheduledGen'));
+app.use('/api/prompt-ip-similarity-checker', require('./routes/promptIpSimilarityChecker'));
 
 // Custom Views (mounted before any 404 handler / app.listen)
 app.use('/api/custom-views', require('./routes/customViews'));

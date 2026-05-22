@@ -47,6 +47,12 @@ import GapNoCollaborationSharedWorkspaces from './pages/GapNoCollaborationShared
 import GapNoPublicProfileportfolioPages from './pages/GapNoPublicProfileportfolioPages';
 import GapNoWebhookSurface from './pages/GapNoWebhookSurface';
 import CustomViewsPage from './pages/CustomViewsPage';
+import PromptIpSimilarityChecker from './pages/PromptIpSimilarityChecker';
+
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -78,6 +84,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/insights/timeline" element={<TimelineView />} />
+        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
+        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -123,7 +133,8 @@ function App() {
           <Route path="/gap-no-collaboration-shared-workspaces" element={<GapNoCollaborationSharedWorkspaces />} />
           <Route path="/gap-no-public-profileportfolio-pages" element={<GapNoPublicProfileportfolioPages />} />
           <Route path="/gap-no-webhook-surface" element={<GapNoWebhookSurface />} />
-          <Route path="/custom-views" element={<PrivateWithLayout><CustomViewsPage /></PrivateWithLayout>} />
+        <Route path="/custom-views" element={<PrivateWithLayout><CustomViewsPage /></PrivateWithLayout>} />
+        <Route path="/prompt-ip-similarity-checker" element={<PrivateWithLayout><PromptIpSimilarityChecker /></PrivateWithLayout>} />
 </Routes>
     </BrowserRouter>
   );
