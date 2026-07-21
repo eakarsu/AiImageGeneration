@@ -16,11 +16,6 @@ function Login() {
   const toast = useToast();
   const { getFieldError, handleBlur, validateAll } = useFormValidation(rules);
 
-  const handleAutofill = () => {
-    setEmail('demo@example.com');
-    setPassword('password123');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -49,9 +44,6 @@ function Login() {
         <h1>AI Image Gen</h1>
         <p>Sign in to start generating images</p>
         {error && <div className="error-msg">{error}</div>}
-        <button className="btn-autofill" onClick={handleAutofill}>
-          Auto-fill Demo Credentials
-        </button>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>

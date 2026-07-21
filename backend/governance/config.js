@@ -1,0 +1,33 @@
+module.exports={
+  caseType:'approved_image_asset_release',initialState:'source_ingested',
+  states:['source_ingested','rights_verified','timeline_edited','render_queued','render_observed','quality_evaluated','accessibility_review','moderation_review','payment_review','publication_review','release_approved','export_observed','render_failed','payment_failed','publish_failed','correction','closed'],
+  createRoles:['creative_editor','creative_producer'],assessmentRoles:['creative_editor','rights_reviewer','accessibility_reviewer','moderation_reviewer','creative_producer'],auditRoles:['creative_producer','privacy_officer','rights_reviewer','auditor'],connectorRoles:['integration_operator','creative_producer'],
+  evidenceKinds:['source_manifest','consent_record','rights_license','asset_version','edit_timeline','model_version','render_receipt','quality_report','accessibility_report','moderation_report','watermark_receipt','usage_receipt','payment_receipt','publication_approval','export_receipt','provider_failure','correction_record'],
+  requiredSignals:['sourceVersion','rightsVersion','modelVersion','policyVersion','brandVersion','rightsVerified','consentVerified','moderationPass','watermarkApplied','accessibilityScore','layoutFidelity','qualityScore','multilingualPassRate','exportCompatibility','usageCost','paymentStatus'],
+  professionalBoundary:'Generation remains a reviewable draft. The API never claims ownership, impersonates a person, charges an account, publishes media, or removes disclosure without verified rights, consent, moderation, and independent publication approval.',
+  connectors:[{name:'media_model',purpose:'versioned queued rendering and receipts'},{name:'rights_library',purpose:'license and consent provenance'},{name:'asset_library',purpose:'source and edit-version manifests'},{name:'storage_cdn',purpose:'encrypted objects and immutable delivery receipts'},{name:'transcription_translation',purpose:'caption and locale artifact receipts'},{name:'publishing',purpose:'approved channel publication receipts'},{name:'payment',purpose:'human-approved usage charge receipts'},{name:'usage_accounting',purpose:'metering and budget reconciliation'},{name:'moderation',purpose:'versioned safety classification evidence'}],
+  transitions:[
+    {from:'source_ingested',action:'verify_rights',to:'rights_verified',roles:['rights_reviewer'],requiresEvidence:true},
+    {from:'rights_verified',action:'record_timeline_edit',to:'timeline_edited',roles:['creative_editor'],requiresEvidence:true},
+    {from:'timeline_edited',action:'queue_render_observation',to:'render_queued',roles:['creative_producer'],requiresEvidence:true},
+    {from:'render_queued',action:'record_render_receipt',to:'render_observed',roles:['integration_operator','creative_producer'],requiresEvidence:true},
+    {from:'render_queued',action:'record_render_failure',to:'render_failed',roles:['integration_operator','creative_producer'],requiresEvidence:true},
+    {from:'render_observed',action:'evaluate_quality',to:'quality_evaluated',roles:['creative_editor','creative_producer'],requiresEvidence:true},
+    {from:'quality_evaluated',action:'review_accessibility',to:'accessibility_review',roles:['accessibility_reviewer'],requiresEvidence:true},
+    {from:'accessibility_review',action:'review_moderation',to:'moderation_review',roles:['moderation_reviewer'],requiresEvidence:true},
+    {from:'moderation_review',action:'review_payment',to:'payment_review',roles:['creative_producer'],requiresEvidence:true,dualControl:true},
+    {from:'payment_review',action:'record_payment_failure',to:'payment_failed',roles:['integration_operator','creative_producer'],requiresEvidence:true},
+    {from:'payment_review',action:'submit_publication_review',to:'publication_review',roles:['creative_producer','rights_reviewer'],requiresEvidence:true},
+    {from:'publication_review',action:'approve_release_observation',to:'release_approved',roles:['creative_producer','rights_reviewer'],requiresEvidence:true,dualControl:true},
+    {from:'release_approved',action:'record_export_receipt',to:'export_observed',roles:['integration_operator','creative_producer'],requiresEvidence:true},
+    {from:'release_approved',action:'record_publish_failure',to:'publish_failed',roles:['integration_operator','creative_producer'],requiresEvidence:true},
+    {from:'render_failed',action:'request_correction',to:'correction',roles:['creative_editor','creative_producer'],requiresEvidence:true},
+    {from:'payment_failed',action:'request_correction',to:'correction',roles:['creative_editor','creative_producer'],requiresEvidence:true},
+    {from:'publish_failed',action:'request_correction',to:'correction',roles:['creative_editor','creative_producer'],requiresEvidence:true},
+    {from:'export_observed',action:'close_asset',to:'closed',roles:['creative_producer','auditor'],requiresEvidence:true}
+  ],
+  acceptedFixture:{sourceVersion:'s1',rightsVersion:'r1',modelVersion:'m1',policyVersion:'p1',brandVersion:'b1',rightsVerified:true,consentVerified:true,moderationPass:true,watermarkApplied:true,accessibilityScore:0.95,layoutFidelity:0.96,qualityScore:0.94,multilingualPassRate:1,exportCompatibility:true,usageCost:4.2,paymentStatus:'reconciled'},
+  rejectedFixture:{sourceVersion:'s1',rightsVersion:'r1',modelVersion:'m1',policyVersion:'p1',brandVersion:'b1',rightsVerified:false,consentVerified:true,moderationPass:true,watermarkApplied:true,accessibilityScore:0.95,layoutFidelity:0.96,qualityScore:0.94,multilingualPassRate:1,exportCompatibility:true,usageCost:4.2,paymentStatus:'reconciled'},
+  readyDisposition:'independent_publication_review_required',holdDisposition:'rights_quality_moderation_or_payment_hold',decisionField:'publishCommand',
+  assess:x=>{const accessibility=Number(x.accessibilityScore),layout=Number(x.layoutFidelity),quality=Number(x.qualityScore),multilingual=Number(x.multilingualPassRate),cost=Number(x.usageCost);const ready=x.rightsVerified===true&&x.consentVerified===true&&x.moderationPass===true&&x.watermarkApplied===true&&accessibility>=0.9&&layout>=0.9&&quality>=0.9&&multilingual>=0.95&&x.exportCompatibility===true&&x.paymentStatus==='reconciled';return{disposition:ready?'independent_publication_review_required':'rights_quality_moderation_or_payment_hold',publishCommand:null,renderCommand:null,paymentCommand:null,metrics:{accessibility,layout,quality,multilingual,cost},versions:{source:x.sourceVersion,rights:x.rightsVersion,model:x.modelVersion,policy:x.policyVersion,brand:x.brandVersion}};}
+};

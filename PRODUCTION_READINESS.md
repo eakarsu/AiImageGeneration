@@ -1,0 +1,7 @@
+# Governed image-asset release
+
+The supported API is `/api/governance`. It records source ingestion, rights and consent evidence, editable timelines, render queues and receipts, quality/accessibility/moderation review, watermark disclosure, usage/payment reconciliation, publication approval, export, failures, and correction. It never renders, charges, publishes, impersonates, or asserts rights autonomously.
+
+Apply `backend/migrations/001_governed_image_asset_release.sql` separately. Pre-provision tenant memberships and opaque asset scopes. Media/model, rights/asset, storage/CDN, transcription/translation, publishing, payment, usage, and moderation workers remain quarantined until credentials, licenses, consent, data contracts, signed receipts, retry/dead-letter, deletion, and recovery tests pass. The prior generated payment gap is replaced on the supported path by durable payment evidence and outbox reconciliation.
+
+Use `.env.example`; production rejects weak secrets, wildcard CORS, demo/mock/provider flags, and startup mutation. `start.sh` never installs, seeds, migrates, resets data, or reclaims ports. Rights counsel and safety reviewers must validate output quality, timing/layout, accessibility, multilingual exports, disclosure, impersonation, brand constraints, budgets, provider failure, and real publication outcomes. No live media generation, charge, or publication was performed here.
