@@ -3,12 +3,20 @@ const bcrypt = require('bcryptjs');
 const { generateImage } = require('./imageGenerator');
 const fs = require('fs');
 const path = require('path');
-const { createCanvas } = require('canvas');
+// The N-API build is ABI-stable across supported Node releases; the legacy
+// canvas package can otherwise fail after switching local Node versions.
+const { createCanvas } = require('@napi-rs/canvas');
 
 const imagesDir = path.join(__dirname, 'generated_images');
 if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
 
 // Generate a placeholder image when SD server is unavailable
+function requireDemoPassword() {
+  const password = process.env.DEMO_PASSWORD || process.env.SEED_DEMO_PASSWORD || process.env.DEMO_SEED_PASSWORD || '';
+  if (password.length < 12 || password.length > 1024) throw new Error('DEMO_PASSWORD must contain 12-1024 characters');
+  return password;
+}
+
 function generatePlaceholder(text) {
   try {
     const canvas = createCanvas(512, 512);
@@ -247,7 +255,7 @@ async function seed() {
   await pool.query('DELETE FROM users');
 
   // Seed demo user
-  const hashed = await bcrypt.hash('password123', 10);
+  const hashed = await bcrypt.hash(requireDemoPassword(), 10);
   const userResult = await pool.query(
     'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id',
     ['demo@example.com', hashed]
@@ -592,7 +600,7 @@ async function seed() {
   }
 
   console.log('Seed complete! Created:');
-  console.log('- 1 demo user (demo@example.com / password123)');
+  console.log('Demo login users provisioned from the local environment.');
   console.log('- 16 prompts');
   console.log('- 15 styles (3 with preview images, 12 without)');
   console.log('- 15 gallery items (3 with generated images, 12 reusing images)');
