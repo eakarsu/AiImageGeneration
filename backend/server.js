@@ -18,6 +18,7 @@ app.use(express.json({limit:'1mb'}));
 app.use(createProviderGate(['/api/ai','/api/gap','/api/generate','/api/providers','/api/payment','/generated']));
 app.get('/api/health',(_req,res)=>res.json({status:'ok',workflow:'approved_image_asset_release',timestamp:new Date().toISOString()}));
 app.use('/api/auth',authRouter);
+app.use('/api/ai',require('./routes/runtimeAi'));
 app.use('/api/governance',governanceRouter);
 app.use((_req,res)=>res.status(404).json({error:'ROUTE_NOT_SUPPORTED'}));
 app.use((error,_req,res,_next)=>{console.error('Request failed:',error.message);res.status(500).json({error:'INTERNAL_SERVER_ERROR'});});
