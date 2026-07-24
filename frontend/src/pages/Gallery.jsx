@@ -40,7 +40,7 @@ function Gallery() {
   useEffect(() => {
     fetch('/api/styles', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
-      .then(data => setStyles(data.items || data))
+      .then(data => setStyles(Array.isArray(data) ? data : (data?.items || data?.data || [])))
       .catch(console.error);
   }, []);
 
@@ -53,8 +53,8 @@ function Gallery() {
     fetch(`/api/gallery?${params}`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => {
-        setItems(data.items);
-        setTotalPages(data.totalPages);
+        setItems(Array.isArray(data) ? data : (data?.items || data?.data || data?.rows || []));
+        setTotalPages(data?.totalPages || 1);
       })
       .catch(console.error);
   };
