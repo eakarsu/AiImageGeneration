@@ -70,7 +70,7 @@ function History() {
   useEffect(() => {
     fetch('/api/styles', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
-      .then(data => setStyles(data.items || data))
+      .then(data => setStyles(Array.isArray(data) ? data : (data?.items || data?.data || [])))
       .catch(console.error);
   }, []);
 
