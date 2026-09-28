@@ -54,6 +54,7 @@ function Login() {
               onBlur={() => handleBlur('email', email, values)}
               className={getFieldError('email') ? 'input-error' : ''}
               placeholder="Enter your email"
+              required
             />
             {getFieldError('email') && <div className="field-error">{getFieldError('email')}</div>}
           </div>
@@ -66,6 +67,7 @@ function Login() {
               onBlur={() => handleBlur('password', password, values)}
               className={getFieldError('password') ? 'input-error' : ''}
               placeholder="Enter your password"
+              required
             />
             {getFieldError('password') && <div className="field-error">{getFieldError('password')}</div>}
           </div>
