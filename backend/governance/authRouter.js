@@ -15,6 +15,15 @@ router.post('/login',async(req,res,next)=>{try{
   return res.json({token,user:{id:user.id,email:user.email,role:'creative_producer'}});
 }catch(error){return next(error);}});
 
+router.post('/demo-login',async(_req,res,next)=>{try{
+  if(process.env.ENABLE_DEMO_CREDENTIAL_AUTOFILL!=='true')return res.status(404).json({error:'DEMO_LOGIN_DISABLED'});
+  const email=String(process.env.DEMO_EMAIL||'demo@example.com').trim().toLowerCase();
+  const result=await pool.query('SELECT id,email FROM users WHERE lower(email)=$1 LIMIT 1',[email]);const user=result.rows[0];
+  if(!user)return res.status(404).json({error:'DEMO_ACCOUNT_NOT_FOUND'});
+  const token=jwt.sign({id:user.id,email:user.email},process.env.JWT_SECRET,{algorithm:'HS256',expiresIn:'1h'});
+  return res.json({token,user:{id:user.id,email:user.email,role:'creative_producer'}});
+}catch(error){return next(error);}});
+
 router.get('/me',auth,async(req,res,next)=>{try{
   const result=await pool.query(`SELECT u.id,u.email,m.tenant_id,m.role FROM users u
     LEFT JOIN governed_tenant_memberships m ON m.actor_id=u.id::text AND m.active=TRUE

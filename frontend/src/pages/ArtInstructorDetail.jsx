@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -163,9 +165,11 @@ function ArtInstructorDetail() {
           <p>{new Date(item.created_at).toLocaleString()}</p>
         </div>
       </div>
+      <StructuredAIResult record={item} title="Saved art lesson response" saved />
 
       {showEdit && (
         <Modal title="Edit Lesson" onClose={() => setShowEdit(false)}>
+          <ImageAIPresets kind="art-instructor" value={form} onChange={setForm} />
           <form onSubmit={handleEdit}>
             <div className="form-group">
               <label>Topic</label>

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -208,9 +210,11 @@ function BrandAssetCreatorDetail() {
           <p>{new Date(item.created_at).toLocaleString()}</p>
         </div>
       </div>
+      <StructuredAIResult record={item} title="Saved brand asset response" saved />
 
       {showEdit && (
         <Modal title="Edit Brand Asset" onClose={() => setShowEdit(false)}>
+          <ImageAIPresets kind="brand-asset-creator" value={form} onChange={setForm} />
           <form onSubmit={handleEdit}>
             <div className="form-group">
               <label>Brand Name</label>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
 
 function Generate() {
   const [prompt, setPrompt] = useState('');
@@ -60,6 +61,20 @@ function Generate() {
         <h1>Generate Image</h1>
       </div>
       <div className="generate-form">
+        <ImageAIPresets
+          kind="generate-image"
+          value={{ title, prompt, negativePrompt, style, seed, steps, guidanceScale }}
+          disabled={loading}
+          onChange={(next) => {
+            setTitle(next.title);
+            setPrompt(next.prompt);
+            setNegativePrompt(next.negativePrompt);
+            setStyle(next.style);
+            setSeed(next.seed);
+            setSteps(next.steps);
+            setGuidanceScale(next.guidanceScale);
+          }}
+        />
         <form onSubmit={handleGenerate}>
           <div className="form-group">
             <label>Title (optional)</label>

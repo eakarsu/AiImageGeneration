@@ -1,3 +1,5 @@
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -176,9 +178,11 @@ function PromptOptimizer() {
         </div>
       )}
 
+      <StructuredAIResult record={latestResult} title="Complete prompt optimization response" />
+
       <div className="filter-bar">
-        <input type="text" placeholder="Search prompts..." value={search} onChange={e => handleSearchChange(e.target.value)} className="filter-input" />
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="sort-select">
+        <input data-ai-field={"search"} type="text" placeholder="Search prompts..." value={search} onChange={e => handleSearchChange(e.target.value)} className="filter-input" />
+        <select data-ai-field={"sortBy"} value={sortBy} onChange={e => setSortBy(e.target.value)} className="sort-select">
           {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </div>
@@ -215,22 +219,17 @@ function PromptOptimizer() {
       )}
       {showModal && (
         <Modal title="Optimize Prompt" onClose={() => setShowModal(false)}>
-          <div className="sample-data-buttons">
-            <span>Load Sample:</span>
-            <button type="button" className="btn-sample" onClick={() => setForm({ original_prompt: 'A beautiful sunset over the ocean with dramatic clouds', style: 'Photorealistic', target_quality: 'high' })}>Sunset</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ original_prompt: 'A mystical forest with glowing mushrooms and fairy lights', style: 'Fantasy', target_quality: 'ultra' })}>Fantasy Forest</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ original_prompt: 'A futuristic city skyline at night with neon lights', style: 'Sci-Fi', target_quality: 'high' })}>Sci-Fi City</button>
-          </div>
+          <ImageAIPresets kind="prompt-optimizer" value={form} onChange={setForm} disabled={loading} />
           <form onSubmit={handleCreate}>
             {error && <div className="error-msg">{error}</div>}
-            <div className="form-group"><label>Original Prompt *</label><textarea value={form.original_prompt} onChange={e => setForm({...form, original_prompt: e.target.value})} placeholder="Enter your basic prompt to optimize..." required /></div>
+            <div className="form-group"><label>Original Prompt *</label><textarea data-ai-field={"original_prompt"} value={form.original_prompt} onChange={e => setForm({...form, original_prompt: e.target.value})} placeholder="Enter your basic prompt to optimize..." required /></div>
             <div className="form-group"><label>Style (optional)</label>
-              <select value={form.style} onChange={e => setForm({...form, style: e.target.value})}>
+              <select data-ai-field={"style"} value={form.style} onChange={e => setForm({...form, style: e.target.value})}>
                 <option value="">General</option><option value="Photorealistic">Photorealistic</option><option value="Fantasy">Fantasy</option><option value="Sci-Fi">Sci-Fi</option><option value="Portrait">Portrait</option><option value="Landscape">Landscape</option><option value="Abstract">Abstract</option>
               </select>
             </div>
             <div className="form-group"><label>Target Quality</label>
-              <select value={form.target_quality} onChange={e => setForm({...form, target_quality: e.target.value})}>
+              <select data-ai-field={"target_quality"} value={form.target_quality} onChange={e => setForm({...form, target_quality: e.target.value})}>
                 <option value="standard">Standard</option><option value="high">High</option><option value="ultra">Ultra</option>
               </select>
             </div>

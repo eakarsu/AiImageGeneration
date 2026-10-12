@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -170,9 +172,11 @@ function VariationGeneratorDetail() {
           <p>{new Date(item.created_at).toLocaleString()}</p>
         </div>
       </div>
+      <StructuredAIResult record={item} title="Saved variation response" saved />
 
       {showEdit && (
         <Modal title="Edit Variations" onClose={() => setShowEdit(false)}>
+          <ImageAIPresets kind="variation-generator" value={form} onChange={setForm} />
           <form onSubmit={handleEdit}>
             <div className="form-group">
               <label>Original Prompt</label>

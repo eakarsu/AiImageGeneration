@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -167,6 +169,8 @@ function StyleTransfer() {
         </div>
       )}
 
+      <StructuredAIResult record={latestResult} title="Complete style transfer response" />
+
       <div className="filter-bar">
         <input type="text" placeholder="Search style transfers..." value={search} onChange={e => handleSearchChange(e.target.value)} className="filter-input" />
         <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="sort-select">
@@ -210,12 +214,7 @@ function StyleTransfer() {
       )}
       {showModal && (
         <Modal title="New Style Transfer" onClose={() => setShowModal(false)}>
-          <div className="sample-data-buttons">
-            <span>Load Sample:</span>
-            <button type="button" className="btn-sample" onClick={() => setForm({ source_style: 'Photograph', target_style: 'Van Gogh Starry Night', content_description: 'A peaceful countryside with rolling hills and a small village' })}>Van Gogh</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ source_style: 'Digital Art', target_style: 'Anime', content_description: 'A warrior standing on a cliff overlooking a vast ocean' })}>Anime</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ source_style: 'Realistic', target_style: 'Cyberpunk', content_description: 'A busy city street with tall buildings and crowds of people' })}>Cyberpunk</button>
-          </div>
+          <ImageAIPresets kind="style-transfer" value={form} onChange={setForm} disabled={loading} />
           <form onSubmit={handleCreate}>
             {error && <div className="error-msg">{error}</div>}
             <div className="form-group">

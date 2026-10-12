@@ -1,3 +1,5 @@
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -184,9 +186,11 @@ function VariationGenerator() {
         </div>
       )}
 
+      <StructuredAIResult record={latestResult} title="Complete variation response" />
+
       <div className="filter-bar">
-        <input type="text" placeholder="Search variations..." value={search} onChange={e => handleSearchChange(e.target.value)} className="filter-input" />
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="sort-select">
+        <input data-ai-field={"search"} type="text" placeholder="Search variations..." value={search} onChange={e => handleSearchChange(e.target.value)} className="filter-input" />
+        <select data-ai-field={"sortBy"} value={sortBy} onChange={e => setSortBy(e.target.value)} className="sort-select">
           {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </div>
@@ -223,21 +227,16 @@ function VariationGenerator() {
       )}
       {showModal && (
         <Modal title="Generate Variations" onClose={() => setShowModal(false)}>
-          <div className="sample-data-buttons">
-            <span>Load Sample:</span>
-            <button type="button" className="btn-sample" onClick={() => setForm({ original_prompt: 'A majestic dragon flying over a medieval castle at dawn', num_variations: 5, variation_type: 'creative' })}>Dragon</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ original_prompt: 'A cozy coffee shop interior with warm lighting and books', num_variations: 4, variation_type: 'mood' })}>Coffee Shop</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ original_prompt: 'An astronaut exploring an alien planet with strange vegetation', num_variations: 6, variation_type: 'style' })}>Astronaut</button>
-          </div>
+          <ImageAIPresets kind="variation-generator" value={form} onChange={setForm} disabled={loading} />
           <form onSubmit={handleCreate}>
             {error && <div className="error-msg">{error}</div>}
             <div className="form-group">
               <label>Original Prompt *</label>
-              <textarea value={form.original_prompt} onChange={e => setForm({...form, original_prompt: e.target.value})} placeholder="Enter your base prompt to create variations from..." required />
+              <textarea data-ai-field={"original_prompt"} value={form.original_prompt} onChange={e => setForm({...form, original_prompt: e.target.value})} placeholder="Enter your base prompt to create variations from..." required />
             </div>
             <div className="form-group">
               <label>Number of Variations</label>
-              <select value={form.num_variations} onChange={e => setForm({...form, num_variations: parseInt(e.target.value)})}>
+              <select data-ai-field={"num_variations"} value={form.num_variations} onChange={e => setForm({...form, num_variations: parseInt(e.target.value)})}>
                 <option value={3}>3 variations</option>
                 <option value={4}>4 variations</option>
                 <option value={5}>5 variations</option>
@@ -247,7 +246,7 @@ function VariationGenerator() {
             </div>
             <div className="form-group">
               <label>Variation Type</label>
-              <select value={form.variation_type} onChange={e => setForm({...form, variation_type: e.target.value})}>
+              <select data-ai-field={"variation_type"} value={form.variation_type} onChange={e => setForm({...form, variation_type: e.target.value})}>
                 <option value="creative">Creative - Explore different interpretations</option>
                 <option value="style">Style - Different artistic styles</option>
                 <option value="mood">Mood - Different emotional tones</option>

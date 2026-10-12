@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -170,6 +172,8 @@ function Upscaler() {
         </div>
       )}
 
+      <StructuredAIResult record={latestResult} title="Complete upscale response" />
+
       <div className="filter-bar">
         <input type="text" placeholder="Search upscale requests..." value={search} onChange={e => handleSearchChange(e.target.value)} className="filter-input" />
         <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="sort-select">
@@ -209,12 +213,7 @@ function Upscaler() {
       )}
       {showModal && (
         <Modal title="New Upscale Request" onClose={() => setShowModal(false)}>
-          <div className="sample-data-buttons">
-            <span>Load Sample:</span>
-            <button type="button" className="btn-sample" onClick={() => setForm({ image_description: 'High-detail portrait photograph with bokeh background', current_resolution: '512x512', target_resolution: '4096x4096', use_case: 'print' })}>Portrait</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ image_description: 'Landscape digital painting of mountain scenery', current_resolution: '1024x1024', target_resolution: '4096x3072', use_case: 'large_format' })}>Landscape</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ image_description: 'Vintage family photo from the 1960s with slight damage', current_resolution: '256x256', target_resolution: '2048x2048', use_case: 'restoration' })}>Restoration</button>
-          </div>
+          <ImageAIPresets kind="upscaler" value={form} onChange={setForm} disabled={loading} />
           <form onSubmit={handleCreate}>
             {error && <div className="error-msg">{error}</div>}
             <div className="form-group">

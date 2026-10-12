@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -214,6 +216,8 @@ function BrandAssetCreator() {
         </div>
       )}
 
+      <StructuredAIResult record={latestResult} title="Complete brand asset response" />
+
       <div className="filter-bar">
         <input type="text" placeholder="Search brands..." value={search} onChange={e => handleSearchChange(e.target.value)} className="filter-input" />
         <select value={typeFilter} onChange={e => handleTypeChange(e.target.value)} className="filter-select">
@@ -263,12 +267,7 @@ function BrandAssetCreator() {
       )}
       {showModal && (
         <Modal title="Create Brand Asset" onClose={() => setShowModal(false)}>
-          <div className="sample-data-buttons">
-            <span>Load Sample:</span>
-            <button type="button" className="btn-sample" onClick={() => setForm({ brand_name: 'TechNova', brand_values: 'Innovation, cutting-edge technology, reliability, modern', asset_type: 'Logo', color_preferences: 'Blue, silver, white' })}>Tech Brand</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ brand_name: 'Green Earth Organics', brand_values: 'Sustainability, natural, healthy, eco-friendly', asset_type: 'Brand Kit', color_preferences: 'Forest green, earth brown, cream' })}>Organic Brand</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ brand_name: 'Luxe Studio', brand_values: 'Luxury, elegance, exclusivity, premium quality', asset_type: 'Social Media Kit', color_preferences: 'Gold, black, ivory' })}>Luxury Brand</button>
-          </div>
+          <ImageAIPresets kind="brand-asset-creator" value={form} onChange={setForm} disabled={loading} />
           <form onSubmit={handleCreate}>
             {error && <div className="error-msg">{error}</div>}
             <div className="form-group">

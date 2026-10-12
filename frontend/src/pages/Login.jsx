@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '../components/ToastContext';
 import useFormValidation, { validators } from '../hooks/useFormValidation';
@@ -9,6 +9,9 @@ const rules = {
 };
 
 function Login() {
+  const demoLoginLock = useRef(false);
+  const [demoLoginBusy, setDemoLoginBusy] = useState(false);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -33,6 +36,26 @@ function Login() {
       navigate('/');
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    if (demoLoginLock.current) return;
+    demoLoginLock.current = true;
+    setDemoLoginBusy(true);
+    setError('');
+    try {
+      const res = await fetch('/api/auth/demo-login', { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error === 'DEMO_LOGIN_DISABLED' ? 'Demo login is not enabled in this environment.' : data.error || 'Demo login is unavailable.');
+      localStorage.setItem('token', data.token);
+      toast.success('Welcome to the demo!');
+      navigate('/');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      demoLoginLock.current = false;
+      setDemoLoginBusy(false);
     }
   };
 
@@ -76,12 +99,12 @@ function Login() {
           </div>
           <button
             type="button"
-            onClick={() => { setEmail(import.meta.env.VITE_DEMO_EMAIL || ''); setPassword(import.meta.env.VITE_DEMO_PASSWORD || ''); }}
-            disabled={!import.meta.env.VITE_DEMO_EMAIL || !import.meta.env.VITE_DEMO_PASSWORD}
-            aria-label="Auto Fill Demo Credentials"
-            style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '8px', border: '1px solid currentColor', background: 'transparent', cursor: 'pointer' }}
+            onClick={handleDemoLogin}
+            disabled={demoLoginBusy}
+            aria-label="Log in as Demo"
+            style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #6d5fb7', color: '#e0e0e0', background: 'transparent', cursor: demoLoginBusy ? 'wait' : 'pointer' }}
           >
-            Auto Fill Demo Credentials
+            {demoLoginBusy ? 'Opening Demo…' : 'Log in as Demo'}
           </button>
           <button type="submit" className="btn-login">Sign In</button>
         </form>

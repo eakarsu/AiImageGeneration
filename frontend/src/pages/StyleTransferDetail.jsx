@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -184,9 +186,11 @@ function StyleTransferDetail() {
           <p>{new Date(item.created_at).toLocaleString()}</p>
         </div>
       </div>
+      <StructuredAIResult record={item} title="Saved style transfer response" saved />
 
       {showEdit && (
         <Modal title="Edit Style Transfer" onClose={() => setShowEdit(false)}>
+          <ImageAIPresets kind="style-transfer" value={form} onChange={setForm} />
           <form onSubmit={handleEdit}>
             <div className="form-group">
               <label>Source Style</label>

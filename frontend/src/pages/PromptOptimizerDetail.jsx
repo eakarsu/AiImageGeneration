@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -86,9 +88,11 @@ function PromptOptimizerDetail() {
         {aiResponse.negativePrompt && <div className="ai-result-section"><h3>Suggested Negative Prompt</h3><div className="ai-result-box negative"><p>{aiResponse.negativePrompt}</p><button className="btn-copy" onClick={() => copyToClipboard(aiResponse.negativePrompt)}>Copy</button></div></div>}
         <div className="detail-info"><label>Created</label><p>{new Date(item.created_at).toLocaleString()}</p></div>
       </div>
+      <StructuredAIResult record={item} title="Saved prompt optimization response" saved />
 
       {showEdit && (
         <Modal title="Edit Optimization" onClose={() => setShowEdit(false)}>
+          <ImageAIPresets kind="prompt-optimizer" value={form} onChange={setForm} />
           <form onSubmit={handleEdit}>
             <div className="form-group"><label>Original Prompt</label><textarea value={form.original_prompt} onChange={e => setForm({...form, original_prompt: e.target.value})} required /></div>
             <div className="form-group"><label>Optimized Prompt</label><textarea value={form.optimized_prompt} onChange={e => setForm({...form, optimized_prompt: e.target.value})} /></div>

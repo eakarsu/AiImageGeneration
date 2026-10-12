@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import AIReport from '../components/AIReport';
+import StructuredAIResult from '../components/StructuredAIResult';
+import Modal from '../components/Modal';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import { useToast } from '../components/ToastContext';
@@ -62,6 +65,7 @@ function History() {
   const [styles, setStyles] = useState([]);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [selectedAIResult, setSelectedAIResult] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const debounceRef = useRef(null);
@@ -272,7 +276,7 @@ function History() {
           </div>
           <div className="list-container">
             {aiItems.map(item => (
-              <div key={item.id} className="list-item ai-history-item" onClick={() => !selectMode && navigate(`/${item.feature}`)}>
+              <div key={item.id} className="list-item ai-history-item" onClick={() => !selectMode && setSelectedAIResult(item)}>
                 {selectMode && (
                   <input type="checkbox" className="list-item-checkbox" checked={selectedIds.has(item.id)} onChange={() => toggleSelect(item.id)} onClick={e => e.stopPropagation()} />
                 )}
@@ -294,6 +298,13 @@ function History() {
           </div>
           {aiItems.length === 0 && <p className="empty-state">No AI activity yet. Use any AI feature to see history here.</p>}
         </>
+      )}
+
+      {selectedAIResult && (
+        <Modal title={selectedAIResult.title || 'Saved AI result'} onClose={() => setSelectedAIResult(null)}>
+          <StructuredAIResult record={selectedAIResult} title="Saved AI response" saved />
+          <AIReport response={selectedAIResult.input_data || {}} title="Request inputs" />
+        </Modal>
       )}
 
       {totalPages > 1 && (

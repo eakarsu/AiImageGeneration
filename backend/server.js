@@ -20,6 +20,14 @@ app.get('/api/health',(_req,res)=>res.json({status:'ok',workflow:'approved_image
 app.use('/api/auth',authRouter);
 app.use('/api/ai',require('./routes/runtimeAi'));
 app.use('/api/governance',governanceRouter);
+
+// Advisory AI reports only; native execution and approval routes stay unchanged.
+const aiWorkspaceSupport = require("./aiWorkspaceAdapters.cjs");
+const aiWorkspaceDatabase = require("./db.js");
+app.use('/api/report-workspace', require("./aiWorkspace.cjs").createAIWorkspaceRouter({
+  pool: aiWorkspaceDatabase, authenticateToken: require("./middleware/auth.js"),
+  aiRateLimiter: aiWorkspaceSupport.createWorkspaceLimiter(), features: require("./aiWorkspaceFeatures.json"),
+}));
 app.use((_req,res)=>res.status(404).json({error:'ROUTE_NOT_SUPPORTED'}));
 app.use((error,_req,res,_next)=>{console.error('Request failed:',error.message);res.status(500).json({error:'INTERNAL_SERVER_ERROR'});});
 app.listen(port,()=>console.log(`Governed image-generation API listening on ${port}`));

@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import ImageAIPresets from '../components/ImageAIPresets';
+import StructuredAIResult from '../components/StructuredAIResult';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastContext';
@@ -173,6 +175,8 @@ function ArtInstructor() {
         </div>
       )}
 
+      <StructuredAIResult record={latestResult} title="Complete art lesson response" />
+
       <div className="filter-bar">
         <input type="text" placeholder="Search topics..." value={search} onChange={e => handleSearchChange(e.target.value)} className="filter-input" />
         <select value={skillFilter} onChange={e => handleSkillChange(e.target.value)} className="filter-select">
@@ -218,12 +222,7 @@ function ArtInstructor() {
       )}
       {showModal && (
         <Modal title="Create New Lesson" onClose={() => setShowModal(false)}>
-          <div className="sample-data-buttons">
-            <span>Load Sample:</span>
-            <button type="button" className="btn-sample" onClick={() => setForm({ topic: 'Color Theory and Color Mixing', skill_level: 'beginner', art_form: 'digital' })}>Color Theory</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ topic: 'Portrait Drawing - Facial Proportions', skill_level: 'intermediate', art_form: 'traditional' })}>Portrait</button>
-            <button type="button" className="btn-sample" onClick={() => setForm({ topic: 'Advanced Lighting and Shadow Techniques', skill_level: 'advanced', art_form: 'digital' })}>Lighting</button>
-          </div>
+          <ImageAIPresets kind="art-instructor" value={form} onChange={setForm} disabled={loading} />
           <form onSubmit={handleCreate}>
             {error && <div className="error-msg">{error}</div>}
             <div className="form-group">
